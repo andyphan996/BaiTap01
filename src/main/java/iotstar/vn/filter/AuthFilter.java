@@ -21,7 +21,11 @@ public class AuthFilter implements Filter {
 
         String path = request.getRequestURI().substring(request.getContextPath().length());
 
-        boolean isPublic = path.equals("/login") || path.equals("/register")
+        boolean isPublic = path.equals("/") || path.equals("/index.jsp")
+                || path.equals("/login") || path.equals("/register")
+                || path.equals("/verify-otp")
+                || path.equals("/forgot-password") || path.equals("/reset-password")
+                || path.equals("/home") || path.equals("/product") || path.equals("/product-detail")
                 || path.startsWith("/images/")
                 || path.startsWith("/assets") || path.endsWith(".css") || path.endsWith(".js");
 

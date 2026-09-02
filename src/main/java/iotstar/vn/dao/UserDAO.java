@@ -24,6 +24,20 @@ public class UserDAO {
         }
     }
 
+    public User findByEmail(String email) {
+        EntityManager em = JpaConfig.getEntityManager();
+        try {
+            TypedQuery<User> q = em.createQuery(
+                "SELECT u FROM User u WHERE u.email = :email", User.class);
+            q.setParameter("email", email);
+            return q.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        } finally {
+            em.close();
+        }
+    }
+
     public boolean existsByUsernameOrEmail(String username, String email) {
         EntityManager em = JpaConfig.getEntityManager();
         try {

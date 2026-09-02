@@ -2,6 +2,8 @@ package iotstar.vn.servlet;
 
 import iotstar.vn.dao.UserDAO;
 import iotstar.vn.entity.User;
+import iotstar.vn.util.MailUtil;
+import iotstar.vn.util.OtpUtil;
 import iotstar.vn.util.PasswordUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -41,9 +43,23 @@ public class RegisterServlet extends HttpServlet {
         user.setEmail(email);
         user.setFullName(fullName);
         user.setRole("USER");
+        user.setEnabled(false);
+
+        String otp = OtpUtil.generateOtp();
+        user.setOtpCode(otp);
+        user.setOtpExpiry(OtpUtil.newExpiry());
 
         userDAO.save(user);
 
-        resp.sendRedirect(req.getContextPath() + "/login?registered=1");
+        try {
+            MailUtil.sendActivationOtp(email, otp);
+        } catch (RuntimeException e) {
+            // Vẫn cho qua để không chặn luồng đăng ký, nhưng báo lỗi rõ ràng để dev biết cấu hình mail sai
+            req.setAttribute("error", "Đăng ký thành công nhưng gửi email OTP thất bại: " + e.getMessage());
+            req.getRequestDispatcher("register.jsp").forward(req, resp);
+            return;
+        }
+
+        resp.sendRedirect(req.getContextPath() + "/verify-otp?email=" + java.net.URLEncoder.encode(email, "UTF-8"));
     }
 }

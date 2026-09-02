@@ -35,9 +35,16 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
+        if (!user.isEnabled()) {
+            req.setAttribute("error", "Tài khoản chưa được kích hoạt. Vui lòng kiểm tra email để nhập mã OTP.");
+            req.setAttribute("unverifiedEmail", user.getEmail());
+            req.getRequestDispatcher("login.jsp").forward(req, resp);
+            return;
+        }
+
         HttpSession session = req.getSession();
         session.setAttribute("loggedUser", user);
 
-        resp.sendRedirect(req.getContextPath() + "/home.jsp");
+        resp.sendRedirect(req.getContextPath() + "/home");
     }
 }

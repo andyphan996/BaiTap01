@@ -18,7 +18,7 @@
 
         <c:if test="${not empty category.imagePath}">
             <p>Ảnh hiện tại:</p>
-            <img src="${pageContext.request.contextPath}/images/${category.imagePath}" width="150"/>
+            <img src="${pageContext.request.contextPath}/images/categories/${category.imagePath}" width="150"/>
         </c:if>
 
         <button type="submit">Lưu</button>

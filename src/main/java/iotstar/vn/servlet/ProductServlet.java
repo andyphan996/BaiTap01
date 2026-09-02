@@ -1,7 +1,9 @@
 package iotstar.vn.servlet;
 
 import iotstar.vn.dao.CategoryDAO;
+import iotstar.vn.dao.ProductDAO;
 import iotstar.vn.entity.Category;
+import iotstar.vn.entity.Product;
 import iotstar.vn.util.Constants;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -10,17 +12,22 @@ import jakarta.servlet.http.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.UUID;
 
-@WebServlet("/category")
+/**
+ * Quản lý CRUD cho Product (dành cho khu vực quản trị, yêu cầu đăng nhập - xem AuthFilter).
+ */
+@WebServlet("/product-admin")
 @MultipartConfig(
     fileSizeThreshold = 1024 * 1024,      // 1MB
     maxFileSize = 1024 * 1024 * 5,        // 5MB / file
     maxRequestSize = 1024 * 1024 * 25     // 25MB / request
 )
-public class CategoryServlet extends HttpServlet {
+public class ProductServlet extends HttpServlet {
 
-    private final CategoryDAO dao = new CategoryDAO();
+    private final ProductDAO productDAO = new ProductDAO();
+    private final CategoryDAO categoryDAO = new CategoryDAO();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -31,25 +38,27 @@ public class CategoryServlet extends HttpServlet {
 
         switch (action) {
             case "new":
-                req.getRequestDispatcher("category/form.jsp").forward(req, resp);
+                req.setAttribute("categories", categoryDAO.findAll());
+                req.getRequestDispatcher("product-admin/form.jsp").forward(req, resp);
                 break;
             case "edit":
                 Long id = Long.parseLong(req.getParameter("id"));
-                req.setAttribute("category", dao.findById(id));
-                req.getRequestDispatcher("category/form.jsp").forward(req, resp);
+                req.setAttribute("product", productDAO.findById(id));
+                req.setAttribute("categories", categoryDAO.findAll());
+                req.getRequestDispatcher("product-admin/form.jsp").forward(req, resp);
                 break;
             case "delete":
-                Category toDelete = dao.findById(Long.parseLong(req.getParameter("id")));
+                Product toDelete = productDAO.findById(Long.parseLong(req.getParameter("id")));
                 if (toDelete != null && toDelete.getImagePath() != null) {
-                    File oldFile = new File(Constants.CATEGORY_UPLOAD_DIRECTORY, toDelete.getImagePath());
+                    File oldFile = new File(Constants.PRODUCT_UPLOAD_DIRECTORY, toDelete.getImagePath());
                     if (oldFile.exists()) oldFile.delete();
                 }
-                dao.delete(Long.parseLong(req.getParameter("id")));
-                resp.sendRedirect(req.getContextPath() + "/category");
+                productDAO.delete(Long.parseLong(req.getParameter("id")));
+                resp.sendRedirect(req.getContextPath() + "/product-admin");
                 break;
             default:
-                req.setAttribute("categories", dao.findAll());
-                req.getRequestDispatcher("category/list.jsp").forward(req, resp);
+                req.setAttribute("products", productDAO.findAll());
+                req.getRequestDispatcher("product-admin/list.jsp").forward(req, resp);
         }
     }
 
@@ -60,16 +69,24 @@ public class CategoryServlet extends HttpServlet {
         String idParam = req.getParameter("id");
         String name = req.getParameter("name");
         String description = req.getParameter("description");
+        String priceParam = req.getParameter("price");
+        String quantityParam = req.getParameter("quantity");
+        String categoryIdParam = req.getParameter("categoryId");
 
-        Category cat;
+        Product product;
         if (idParam == null || idParam.isEmpty()) {
-            cat = new Category();
+            product = new Product();
         } else {
-            cat = dao.findById(Long.parseLong(idParam));
+            product = productDAO.findById(Long.parseLong(idParam));
         }
 
-        cat.setName(name);
-        cat.setDescription(description);
+        product.setName(name);
+        product.setDescription(description);
+        product.setPrice(new BigDecimal(priceParam));
+        product.setQuantity(Integer.parseInt(quantityParam));
+
+        Category category = categoryDAO.findById(Long.parseLong(categoryIdParam));
+        product.setCategory(category);
 
         // ----- Xử lý upload ảnh -----
         Part filePart = req.getPart("image"); // đúng tên input trong form
@@ -79,27 +96,27 @@ public class CategoryServlet extends HttpServlet {
             String ext = originalName.substring(originalName.lastIndexOf('.'));
             String newFileName = UUID.randomUUID().toString() + ext;
 
-            File uploadDir = new File(Constants.CATEGORY_UPLOAD_DIRECTORY);
+            File uploadDir = new File(Constants.PRODUCT_UPLOAD_DIRECTORY);
             if (!uploadDir.exists()) {
                 uploadDir.mkdirs();
             }
 
             // Xóa ảnh cũ nếu đang edit và có ảnh cũ
-            if (cat.getImagePath() != null) {
-                File oldFile = new File(uploadDir, cat.getImagePath());
+            if (product.getImagePath() != null) {
+                File oldFile = new File(uploadDir, product.getImagePath());
                 if (oldFile.exists()) oldFile.delete();
             }
 
             filePart.write(uploadDir.getAbsolutePath() + File.separator + newFileName);
-            cat.setImagePath(newFileName);
+            product.setImagePath(newFileName);
         }
 
         if (idParam == null || idParam.isEmpty()) {
-            dao.save(cat);
+            productDAO.save(product);
         } else {
-            dao.update(cat);
+            productDAO.update(product);
         }
 
-        resp.sendRedirect(req.getContextPath() + "/category");
+        resp.sendRedirect(req.getContextPath() + "/product-admin");
     }
 }

@@ -4,6 +4,7 @@
 <head><title>Register</title></head>
 <body>
     <h2>Đăng ký</h2>
+    <p style="color:#555;font-size:14px;">Sau khi đăng ký, hệ thống sẽ gửi mã OTP về email để kích hoạt tài khoản.</p>
     <c:if test="${not empty error}">
         <p style="color:red">${error}</p>
     </c:if>

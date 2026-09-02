@@ -14,4 +14,11 @@ public class JpaConfig {
     public static EntityManager getEntityManager() {
         return factory.createEntityManager();
     }
+
+    /** Đóng EntityManagerFactory đúng cách khi ứng dụng dừng/reload, tránh leak connection pool. */
+    public static void close() {
+        if (factory != null && factory.isOpen()) {
+            factory.close();
+        }
+    }
 }

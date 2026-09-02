@@ -10,6 +10,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+/**
+ * Phục vụ file ảnh đã upload.
+ * URL dạng: /images/categories/{fileName} hoặc /images/products/{fileName}
+ */
 @WebServlet("/images/*")
 public class ImageServlet extends HttpServlet {
 
@@ -17,14 +21,36 @@ public class ImageServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        String fileName = req.getPathInfo();
-        if (fileName == null || fileName.equals("/")) {
+        String pathInfo = req.getPathInfo();
+        if (pathInfo == null || pathInfo.equals("/")) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-        fileName = fileName.substring(1);
 
-        File file = new File(Constants.UPLOAD_DIRECTORY, fileName);
+        // pathInfo dạng "/categories/xxx.jpg" hoặc "/products/xxx.jpg"
+        String[] parts = pathInfo.substring(1).split("/", 2);
+        if (parts.length < 2 || parts[1].isEmpty()) {
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
+        String type = parts[0];
+        String fileName = parts[1];
+
+        String baseDir;
+        switch (type) {
+            case "categories":
+                baseDir = Constants.CATEGORY_UPLOAD_DIRECTORY;
+                break;
+            case "products":
+                baseDir = Constants.PRODUCT_UPLOAD_DIRECTORY;
+                break;
+            default:
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+                return;
+        }
+
+        File file = new File(baseDir, fileName);
         if (!file.exists()) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;

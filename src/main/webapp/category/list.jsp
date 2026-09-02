@@ -14,7 +14,7 @@
                 <td>${c.id}</td>
                 <td>
                     <c:if test="${not empty c.imagePath}">
-                        <img src="${pageContext.request.contextPath}/images/${c.imagePath}" width="80"/>
+                        <img src="${pageContext.request.contextPath}/images/categories/${c.imagePath}" width="80"/>
                     </c:if>
                 </td>
                 <td>${c.name}</td>

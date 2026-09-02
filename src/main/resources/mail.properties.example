@@ -1,0 +1,12 @@
+
+# Nếu dùng Gmail:
+#   - mail.smtp.username = địa chỉ Gmail
+#   - mail.smtp.password = App Password (KHÔNG dùng mật khẩu Gmail thường)
+#     Tạo App Password tại: https://myaccount.google.com/apppasswords
+#     (yêu cầu tài khoản Google đã bật xác thực 2 bước)
+
+mail.smtp.host=smtp.gmail.com
+mail.smtp.port=587
+mail.smtp.username=your-email@gmail.com
+mail.smtp.password=your-app-password
+mail.from.name=IoTStar

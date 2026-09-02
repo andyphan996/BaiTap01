@@ -29,6 +29,18 @@ public class User {
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    // Tài khoản chỉ dùng được sau khi xác thực OTP qua email
+    @Column(nullable = false)
+    private boolean enabled = false;
+
+    // Mã OTP dùng chung cho kích hoạt tài khoản và quên mật khẩu
+    @Column(name = "otp_code", length = 6)
+    private String otpCode;
+
+    // Thời điểm hết hạn của otpCode
+    @Column(name = "otp_expiry")
+    private LocalDateTime otpExpiry;
+
     public User() {}
 
     // Getters & Setters
@@ -46,4 +58,10 @@ public class User {
     public void setRole(String role) { this.role = role; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public boolean isEnabled() { return enabled; }
+    public void setEnabled(boolean enabled) { this.enabled = enabled; }
+    public String getOtpCode() { return otpCode; }
+    public void setOtpCode(String otpCode) { this.otpCode = otpCode; }
+    public LocalDateTime getOtpExpiry() { return otpExpiry; }
+    public void setOtpExpiry(LocalDateTime otpExpiry) { this.otpExpiry = otpExpiry; }
 }

@@ -92,6 +92,21 @@
 		    <scope>runtime</scope>
 		</dependency>
 
+        <!-- Lombok: sinh getter/setter và constructor khi biên dịch -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.42</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- SiteMesh 3 hỗ trợ Jakarta Servlet -->
+        <dependency>
+            <groupId>org.sitemesh</groupId>
+            <artifactId>sitemesh</artifactId>
+            <version>3.2.1</version>
+        </dependency>
+
     </dependencies>
 
     <build>

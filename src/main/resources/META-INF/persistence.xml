@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence
+             https://jakarta.ee/xml/ns/persistence/persistence_3_2.xsd"
+             version="3.2">
+
+    <persistence-unit name="jpa-hibernate-postgresql" transaction-type="RESOURCE_LOCAL">
+
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+        <class>iotstar.vn.entity.User</class>
+        <class>iotstar.vn.entity.Category</class>
+        <class>iotstar.vn.entity.Product</class>
+
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>
+
+        <properties>
+            <!-- ĐỔI lại thông tin kết nối Postgres -->
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5433/baitap01_db"/>
+            <property name="jakarta.persistence.jdbc.user" value="postgres"/>
+            <property name="jakarta.persistence.jdbc.password" value="123456"/>
+            <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
+
+            <!-- tự tạo/cập nhật bảng dựa trên entity  -->
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
+
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.format_sql" value="true"/>
+            <property name="hibernate.connection.pool_size" value="10"/>
+
+        </properties>
+
+    </persistence-unit>
+
+</persistence>

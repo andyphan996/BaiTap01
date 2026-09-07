@@ -12,7 +12,7 @@ import java.io.OutputStream;
 
 /**
  * Phục vụ file ảnh đã upload.
- * URL dạng: /images/categories/{fileName} hoặc /images/products/{fileName}
+ * URL dạng: /images/categories/{fileName}, /images/products/{fileName} hoặc /images/users/{fileName}
  */
 @WebServlet("/images/*")
 public class ImageServlet extends HttpServlet {
@@ -44,6 +44,9 @@ public class ImageServlet extends HttpServlet {
                 break;
             case "products":
                 baseDir = Constants.PRODUCT_UPLOAD_DIRECTORY;
+                break;
+            case "users":
+                baseDir = Constants.USER_UPLOAD_DIRECTORY;
                 break;
             default:
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);

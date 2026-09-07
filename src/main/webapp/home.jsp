@@ -27,6 +27,7 @@
         <c:choose>
             <c:when test="${not empty sessionScope.loggedUser}">
                 Xin chào, ${sessionScope.loggedUser.fullName} (${sessionScope.loggedUser.role})
+                <a href="${pageContext.request.contextPath}/profile">Profile</a>
                 <a href="${pageContext.request.contextPath}/logout">Đăng xuất</a>
             </c:when>
             <c:otherwise>

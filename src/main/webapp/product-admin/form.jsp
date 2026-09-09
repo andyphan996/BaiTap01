@@ -4,15 +4,16 @@
 <head><title>Product Form</title></head>
 <body>
     <h2>${empty product ? "Thêm" : "Sửa"} Product</h2>
+    <c:if test="${not empty error}"><p style="color:red">${error}</p></c:if>
 
     <form method="post" action="${pageContext.request.contextPath}/product-admin"
           enctype="multipart/form-data">
 
         <input type="hidden" name="id" value="${product.id}"/>
 
-        Tên: <input type="text" name="name" value="${product.name}" required/><br/>
+        Tên: <input type="text" name="name" value="${product.name}" maxlength="150" required/><br/>
 
-        Mô tả: <textarea name="description" rows="4" cols="40">${product.description}</textarea><br/>
+        Mô tả: <textarea name="description" rows="4" cols="40" maxlength="2000">${product.description}</textarea><br/>
 
         Giá: <input type="number" step="0.01" min="0" name="price" value="${product.price}" required/><br/>
 
@@ -28,7 +29,7 @@
             </c:forEach>
         </select><br/>
 
-        Ảnh: <input type="file" name="image" accept="image/*"/><br/>
+        Ảnh: <input type="file" name="image" accept=".jpg,.jpeg,.png,.gif,.webp"/><br/>
 
         <c:if test="${not empty product.imagePath}">
             <p>Ảnh hiện tại:</p>

@@ -5,6 +5,7 @@ import iotstar.vn.entity.User;
 import iotstar.vn.util.MailUtil;
 import iotstar.vn.util.OtpUtil;
 import iotstar.vn.util.PasswordUtil;
+import iotstar.vn.util.ValidationUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -30,6 +31,28 @@ public class RegisterServlet extends HttpServlet {
         String password = req.getParameter("password");
         String email = req.getParameter("email");
         String fullName = req.getParameter("fullName");
+
+        if (ValidationUtil.isBlank(username) || username.length() < 3 || username.length() > 50
+                || !username.matches("[A-Za-z0-9_]+")) {
+            req.setAttribute("error", "Username phải dài 3-50 ký tự và chỉ gồm chữ, số hoặc dấu gạch dưới.");
+            req.getRequestDispatcher("register.jsp").forward(req, resp);
+            return;
+        }
+        if (!ValidationUtil.isValidPassword(password)) {
+            req.setAttribute("error", "Mật khẩu phải dài từ 6 đến 100 ký tự.");
+            req.getRequestDispatcher("register.jsp").forward(req, resp);
+            return;
+        }
+        if (!ValidationUtil.isValidEmail(email)) {
+            req.setAttribute("error", "Email không hợp lệ.");
+            req.getRequestDispatcher("register.jsp").forward(req, resp);
+            return;
+        }
+        if (fullName != null && fullName.length() > 100) {
+            req.setAttribute("error", "Họ tên không được vượt quá 100 ký tự.");
+            req.getRequestDispatcher("register.jsp").forward(req, resp);
+            return;
+        }
 
         if (userDAO.existsByUsernameOrEmail(username, email)) {
             req.setAttribute("error", "Username hoặc email đã tồn tại!");

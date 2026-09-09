@@ -4,6 +4,7 @@ import iotstar.vn.dao.UserDAO;
 import iotstar.vn.entity.User;
 import iotstar.vn.util.MailUtil;
 import iotstar.vn.util.OtpUtil;
+import iotstar.vn.util.ValidationUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -26,6 +27,11 @@ public class ForgotPasswordServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String email = req.getParameter("email");
+        if (!ValidationUtil.isValidEmail(email)) {
+            req.setAttribute("error", "Email không hợp lệ.");
+            req.getRequestDispatcher("forgot-password.jsp").forward(req, resp);
+            return;
+        }
         User user = userDAO.findByEmail(email);
 
         if (user == null) {

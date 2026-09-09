@@ -3,6 +3,7 @@ package iotstar.vn.servlet;
 import iotstar.vn.dao.UserDAO;
 import iotstar.vn.entity.User;
 import iotstar.vn.util.PasswordUtil;
+import iotstar.vn.util.ValidationUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -44,11 +45,23 @@ public class UserServlet extends HttpServlet {
         Long id = Long.parseLong(req.getParameter("id"));
         User user = dao.findById(id);
 
-        user.setFullName(req.getParameter("fullName"));
-        user.setEmail(req.getParameter("email"));
-        user.setRole(req.getParameter("role"));
-
+        String fullName = req.getParameter("fullName");
+        String email = req.getParameter("email");
+        String role = req.getParameter("role");
         String newPassword = req.getParameter("password");
+        if ((fullName != null && fullName.length() > 100) || !ValidationUtil.isValidEmail(email)
+                || !("USER".equals(role) || "ADMIN".equals(role))
+                || (!ValidationUtil.isBlank(newPassword) && !ValidationUtil.isValidPassword(newPassword))) {
+            req.setAttribute("error", "Email, role hoặc dữ liệu người dùng không hợp lệ.");
+            req.setAttribute("user", user);
+            req.getRequestDispatcher("user/form.jsp").forward(req, resp);
+            return;
+        }
+
+        user.setFullName(fullName);
+        user.setEmail(email.trim());
+        user.setRole(role);
+
         if (newPassword != null && !newPassword.isEmpty()) {
             user.setPassword(PasswordUtil.hash(newPassword));
         }

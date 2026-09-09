@@ -27,8 +27,8 @@
     </c:if>
 
     <form method="post" action="${pageContext.request.contextPath}/login">
-        Username: <input type="text" name="username" required/><br/>
-        Password: <input type="password" name="password" required/><br/>
+        Username: <input type="text" name="username" minlength="3" maxlength="50" pattern="[A-Za-z0-9_]+" required/><br/>
+        Password: <input type="password" name="password" minlength="6" maxlength="100" required/><br/>
         <button type="submit">Đăng nhập</button>
     </form>
     <a href="${pageContext.request.contextPath}/register">Đăng ký tài khoản mới</a>

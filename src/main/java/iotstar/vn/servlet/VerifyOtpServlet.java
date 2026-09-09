@@ -4,6 +4,7 @@ import iotstar.vn.dao.UserDAO;
 import iotstar.vn.entity.User;
 import iotstar.vn.util.MailUtil;
 import iotstar.vn.util.OtpUtil;
+import iotstar.vn.util.ValidationUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -48,6 +49,13 @@ public class VerifyOtpServlet extends HttpServlet {
 
         String email = req.getParameter("email");
         String otp = req.getParameter("otp");
+
+        if (!ValidationUtil.isValidEmail(email) || !ValidationUtil.isValidOtp(otp)) {
+            req.setAttribute("error", "Email hoặc mã OTP không hợp lệ.");
+            req.setAttribute("email", email);
+            req.getRequestDispatcher("verify-otp.jsp").forward(req, resp);
+            return;
+        }
 
         User user = userDAO.findByEmail(email);
 

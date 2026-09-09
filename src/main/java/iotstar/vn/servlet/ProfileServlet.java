@@ -3,6 +3,7 @@ package iotstar.vn.servlet;
 import iotstar.vn.dao.UserDAO;
 import iotstar.vn.entity.User;
 import iotstar.vn.util.Constants;
+import iotstar.vn.util.ValidationUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -43,8 +44,18 @@ public class ProfileServlet extends HttpServlet {
         User loggedUser = (User) session.getAttribute("loggedUser");
         User user = userDAO.findById(loggedUser.getId());
 
-        user.setFullName(req.getParameter("fullName"));
-        user.setPhone(req.getParameter("phone"));
+        String fullName = req.getParameter("fullName");
+        String phone = req.getParameter("phone");
+        if (ValidationUtil.isBlank(fullName) || fullName.length() > 100
+                || !ValidationUtil.isValidPhone(phone)) {
+            req.setAttribute("error", "Họ tên bắt buộc và số điện thoại phải có 10-15 chữ số.");
+            req.setAttribute("profileUser", user);
+            req.getRequestDispatcher("profile.jsp").forward(req, resp);
+            return;
+        }
+
+        user.setFullName(fullName.trim());
+        user.setPhone(ValidationUtil.isBlank(phone) ? null : phone.trim());
 
         Part filePart = req.getPart("image");
         if (filePart != null && filePart.getSize() > 0) {

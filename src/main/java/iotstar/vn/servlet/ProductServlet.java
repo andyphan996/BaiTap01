@@ -5,6 +5,7 @@ import iotstar.vn.dao.ProductDAO;
 import iotstar.vn.entity.Category;
 import iotstar.vn.entity.Product;
 import iotstar.vn.util.Constants;
+import iotstar.vn.util.ValidationUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -73,6 +74,36 @@ public class ProductServlet extends HttpServlet {
         String quantityParam = req.getParameter("quantity");
         String categoryIdParam = req.getParameter("categoryId");
 
+        BigDecimal price;
+        int quantity;
+        Long categoryId;
+        try {
+            price = new BigDecimal(priceParam);
+            quantity = Integer.parseInt(quantityParam);
+            categoryId = Long.parseLong(categoryIdParam);
+        } catch (NumberFormatException | NullPointerException e) {
+            req.setAttribute("error", "Giá, số lượng và category phải là giá trị hợp lệ.");
+            req.setAttribute("categories", categoryDAO.findAll());
+            req.getRequestDispatcher("product-admin/form.jsp").forward(req, resp);
+            return;
+        }
+        if (ValidationUtil.isBlank(name) || name.trim().length() > 150
+                || (description != null && description.length() > 2000)
+                || price.signum() < 0 || price.scale() > 2 || quantity < 0) {
+            req.setAttribute("error", "Tên bắt buộc; giá và số lượng không âm; dữ liệu không vượt quá giới hạn cho phép.");
+            req.setAttribute("categories", categoryDAO.findAll());
+            req.getRequestDispatcher("product-admin/form.jsp").forward(req, resp);
+            return;
+        }
+
+        Category category = categoryDAO.findById(categoryId);
+        if (category == null) {
+            req.setAttribute("error", "Category không tồn tại.");
+            req.setAttribute("categories", categoryDAO.findAll());
+            req.getRequestDispatcher("product-admin/form.jsp").forward(req, resp);
+            return;
+        }
+
         Product product;
         if (idParam == null || idParam.isEmpty()) {
             product = new Product();
@@ -82,10 +113,9 @@ public class ProductServlet extends HttpServlet {
 
         product.setName(name);
         product.setDescription(description);
-        product.setPrice(new BigDecimal(priceParam));
-        product.setQuantity(Integer.parseInt(quantityParam));
+        product.setPrice(price);
+        product.setQuantity(quantity);
 
-        Category category = categoryDAO.findById(Long.parseLong(categoryIdParam));
         product.setCategory(category);
 
         // ----- Xử lý upload ảnh -----
@@ -93,7 +123,15 @@ public class ProductServlet extends HttpServlet {
 
         if (filePart != null && filePart.getSize() > 0) {
             String originalName = filePart.getSubmittedFileName();
-            String ext = originalName.substring(originalName.lastIndexOf('.'));
+            int dot = originalName == null ? -1 : originalName.lastIndexOf('.');
+            String ext = dot >= 0 ? originalName.substring(dot).toLowerCase() : "";
+            if (!ext.matches("\\.(jpg|jpeg|png|gif|webp)")) {
+                req.setAttribute("error", "Chỉ chấp nhận ảnh JPG, PNG, GIF hoặc WEBP.");
+                req.setAttribute("product", product);
+                req.setAttribute("categories", categoryDAO.findAll());
+                req.getRequestDispatcher("product-admin/form.jsp").forward(req, resp);
+                return;
+            }
             String newFileName = UUID.randomUUID().toString() + ext;
 
             File uploadDir = new File(Constants.PRODUCT_UPLOAD_DIRECTORY);

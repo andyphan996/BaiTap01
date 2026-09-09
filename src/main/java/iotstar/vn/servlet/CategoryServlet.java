@@ -3,6 +3,7 @@ package iotstar.vn.servlet;
 import iotstar.vn.dao.CategoryDAO;
 import iotstar.vn.entity.Category;
 import iotstar.vn.util.Constants;
+import iotstar.vn.util.ValidationUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -68,6 +69,14 @@ public class CategoryServlet extends HttpServlet {
             cat = dao.findById(Long.parseLong(idParam));
         }
 
+        if (ValidationUtil.isBlank(name) || name.trim().length() > 100
+                || (description != null && description.length() > 255)) {
+            req.setAttribute("error", "Tên bắt buộc và không quá 100 ký tự; mô tả không quá 255 ký tự.");
+            req.setAttribute("category", cat);
+            req.getRequestDispatcher("category/form.jsp").forward(req, resp);
+            return;
+        }
+
         cat.setName(name);
         cat.setDescription(description);
 
@@ -76,7 +85,14 @@ public class CategoryServlet extends HttpServlet {
 
         if (filePart != null && filePart.getSize() > 0) {
             String originalName = filePart.getSubmittedFileName();
-            String ext = originalName.substring(originalName.lastIndexOf('.'));
+            int dot = originalName == null ? -1 : originalName.lastIndexOf('.');
+            String ext = dot >= 0 ? originalName.substring(dot).toLowerCase() : "";
+            if (!ext.matches("\\.(jpg|jpeg|png|gif|webp)")) {
+                req.setAttribute("error", "Chỉ chấp nhận ảnh JPG, PNG, GIF hoặc WEBP.");
+                req.setAttribute("category", cat);
+                req.getRequestDispatcher("category/form.jsp").forward(req, resp);
+                return;
+            }
             String newFileName = UUID.randomUUID().toString() + ext;
 
             File uploadDir = new File(Constants.CATEGORY_UPLOAD_DIRECTORY);

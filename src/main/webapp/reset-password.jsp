@@ -12,9 +12,10 @@
 
     <form method="post" action="${pageContext.request.contextPath}/reset-password">
         <input type="hidden" name="email" value="${email}"/>
-        Mã OTP: <input type="text" name="otp" maxlength="6" required/><br/>
-        Mật khẩu mới: <input type="password" name="newPassword" required/><br/>
-        Xác nhận mật khẩu: <input type="password" name="confirmPassword" required/><br/>
+        Mã OTP: <input type="text" name="otp" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required/><br/>
+        Mật khẩu mới: <input type="password" id="newPassword" name="newPassword" minlength="6" maxlength="100" required/><br/>
+        Xác nhận mật khẩu: <input type="password" name="confirmPassword" minlength="6" maxlength="100" required
+            oninput="setCustomValidity(this.value === document.getElementById('newPassword').value ? '' : 'Mật khẩu xác nhận không khớp.')"/><br/>
         <button type="submit">Đặt lại mật khẩu</button>
     </form>
 

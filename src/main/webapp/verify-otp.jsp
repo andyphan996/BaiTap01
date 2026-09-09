@@ -15,7 +15,7 @@
 
     <form method="post" action="${pageContext.request.contextPath}/verify-otp">
         <input type="hidden" name="email" value="${email}"/>
-        Mã OTP: <input type="text" name="otp" maxlength="6" required/><br/>
+        Mã OTP: <input type="text" name="otp" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required/><br/>
         <button type="submit">Xác thực</button>
     </form>
 

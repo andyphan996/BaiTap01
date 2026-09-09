@@ -4,6 +4,7 @@ import iotstar.vn.dao.UserDAO;
 import iotstar.vn.entity.User;
 import iotstar.vn.util.OtpUtil;
 import iotstar.vn.util.PasswordUtil;
+import iotstar.vn.util.ValidationUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -30,6 +31,19 @@ public class ResetPasswordServlet extends HttpServlet {
         String otp = req.getParameter("otp");
         String newPassword = req.getParameter("newPassword");
         String confirmPassword = req.getParameter("confirmPassword");
+
+        if (!ValidationUtil.isValidEmail(email) || !ValidationUtil.isValidOtp(otp)) {
+            req.setAttribute("error", "Email hoặc mã OTP không hợp lệ.");
+            req.setAttribute("email", email);
+            req.getRequestDispatcher("reset-password.jsp").forward(req, resp);
+            return;
+        }
+        if (!ValidationUtil.isValidPassword(newPassword)) {
+            req.setAttribute("error", "Mật khẩu mới phải dài từ 6 đến 100 ký tự.");
+            req.setAttribute("email", email);
+            req.getRequestDispatcher("reset-password.jsp").forward(req, resp);
+            return;
+        }
 
         User user = userDAO.findByEmail(email);
 

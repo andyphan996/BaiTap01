@@ -15,8 +15,8 @@
         <p>Username: <strong>${profileUser.username}</strong></p>
         <p>Email: <strong>${profileUser.email}</strong></p>
         <p>Họ tên: <input type="text" name="fullName" value="${profileUser.fullName}" maxlength="100" required></p>
-        <p>Số điện thoại: <input type="tel" name="phone" value="${profileUser.phone}" maxlength="20"></p>
-        <p>Ảnh đại diện: <input type="file" name="image" accept="image/jpeg,image/png,image/gif,image/webp"></p>
+        <p>Số điện thoại: <input type="tel" name="phone" value="${profileUser.phone}" maxlength="15" pattern="[+]?[0-9]{10,15}"></p>
+        <p>Ảnh đại diện: <input type="file" name="image" accept=".jpg,.jpeg,.png,.gif,.webp"></p>
         <c:if test="${not empty profileUser.imagePath}">
             <p><img src="${pageContext.request.contextPath}/images/users/${profileUser.imagePath}" alt="Ảnh đại diện" width="140"></p>
         </c:if>
